@@ -29,6 +29,7 @@ public class ProductService {
     }
 
     public Product insert(Product product) {
+        //Pas besoin de vérifier, la méthode lève déjà une exception de base.
         return productRepository.insert(product);
     }
 

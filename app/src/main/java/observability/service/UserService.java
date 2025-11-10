@@ -6,6 +6,8 @@ import observability.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -19,5 +21,13 @@ public class UserService {
     public User login(String email, String password) {
         return userRepository.findByEmailAndPassword(email,password).orElseThrow(
                 ()-> new RessourceNotFoundException("Mauvaise combinaison mail/mot de passe"));
+    }
+
+    public User signUp(User user) {
+        Optional<User> maybeUser = userRepository.findByEmail(user.getEmail());
+        if (maybeUser.isPresent()) {
+            throw new IllegalArgumentException("signup() : Un compte avec ce mail existe déjà !");
+        }
+        return userRepository.insert(user);
     }
 }
