@@ -1,6 +1,7 @@
 package observability.service;
 
-import observability.exceptions.RessourceNotFoundException;
+import observability.exceptions.ResourceConflictException;
+import observability.exceptions.ResourceNotFoundException;
 import observability.model.User;
 import observability.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,13 @@ public class UserService {
 
     public User login(String email, String password) {
         return userRepository.findByEmailAndPassword(email,password).orElseThrow(
-                ()-> new RessourceNotFoundException("Mauvaise combinaison mail/mot de passe"));
+                ()-> new ResourceNotFoundException("Mauvaise combinaison mail/mot de passe"));
     }
 
     public User signUp(User user) {
         Optional<User> maybeUser = userRepository.findByEmail(user.getEmail());
         if (maybeUser.isPresent()) {
-            throw new IllegalArgumentException("signup() : Un compte avec ce mail existe déjà !");
+            throw new ResourceConflictException("signup() : Un compte avec ce mail existe déjà !");
         }
         return userRepository.insert(user);
     }

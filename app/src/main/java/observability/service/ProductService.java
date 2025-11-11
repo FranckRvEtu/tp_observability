@@ -1,13 +1,15 @@
 package observability.service;
 
 
-import observability.exceptions.RessourceNotFoundException;
+import observability.exceptions.ResourceConflictException;
+import observability.exceptions.ResourceNotFoundException;
 import observability.model.Product;
 import observability.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -24,12 +26,15 @@ public class ProductService {
 
     public Product findById(String id) {
         return productRepository.findById(id).orElseThrow(
-                ()-> new RessourceNotFoundException("Produit non trouvé avec l'id : "+id)
+                ()-> new ResourceNotFoundException("Produit non trouvé avec l'id : "+id)
         );
     }
 
     public Product insert(Product product) {
-        //Pas besoin de vérifier, la méthode lève déjà une exception de base.
+        Optional<Product> maybeProduct = productRepository.findById(product.getId());
+        if (maybeProduct.isPresent()) {
+            throw new ResourceConflictException("Un produit avec cet identifiant existe déjà");
+        }
         return productRepository.insert(product);
     }
 
