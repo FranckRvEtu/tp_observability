@@ -25,7 +25,8 @@ public class ProductController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.status(HttpStatus.OK).body(productService.findAll());
+        List<Product> products = productService.findAll();
+        return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
     @GetMapping("/fetch")

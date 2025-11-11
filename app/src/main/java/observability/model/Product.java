@@ -3,17 +3,15 @@ package observability.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.sql.Date;
-
 @Document(collection = "products")
 public class Product {
     @Id
     private String id;
     private String name;
     private float price;
-    private Date date;
+    private String date;
 
-    public Product(String id, String name, float price, Date date) {
+    public Product(String id, String name, float price, String date) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -32,7 +30,7 @@ public class Product {
         return price;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
@@ -48,7 +46,7 @@ public class Product {
         this.price = price;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 }
