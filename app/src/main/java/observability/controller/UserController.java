@@ -6,6 +6,7 @@ import observability.model.User;
 import observability.repository.UserRepository;
 import observability.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,15 +24,16 @@ public class UserController {
         this.userService = userService;
     }
 
-
     @PostMapping("/login")
-    public User login(@RequestBody LoginDTO loginDTO) {
-        return userService.login(loginDTO.getEmail(), loginDTO.getPassword());
+    public ResponseEntity<User> login(@RequestBody LoginDTO loginDTO) {
+        User user =  userService.login(loginDTO.getEmail(), loginDTO.getPassword());
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody User requestUser) {
+    //User en requestBody plutôt que de faire un DTO dédié
+    public ResponseEntity<User> signup(@RequestBody User requestUser) {
         User user =  userService.signUp(new User(requestUser.getName(), requestUser.getFirstname(), requestUser.getAge(), requestUser.getEmail(), requestUser.getPassword()));
-        return ResponseEntity.ok("User created : " + user.toString());
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 }
