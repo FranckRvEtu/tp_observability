@@ -1,4 +1,8 @@
 package observability.repository;
 
-public class LogRepository {
+import observability.model.LogEntry;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface LogRepository extends MongoRepository<LogEntry, String> {
+
 }

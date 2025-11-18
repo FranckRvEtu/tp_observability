@@ -2,6 +2,7 @@ package observability.controller;
 
 
 import observability.DTO.LoginDTO;
+import observability.context.UserContext;
 import observability.model.User;
 import observability.repository.UserRepository;
 import observability.service.UserService;
@@ -26,8 +27,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody LoginDTO loginDTO) {
+        System.out.println("Requête reçue : " + loginDTO.toString());
         User user =  userService.login(loginDTO.getEmail(), loginDTO.getPassword());
-
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
