@@ -31,10 +31,6 @@ public class ProductService {
     }
 
     public Product insert(Product product) {
-        Optional<Product> maybeProduct = productRepository.findById(product.getId());
-        if (maybeProduct.isPresent()) {
-            throw new ResourceConflictException("Un produit avec cet identifiant existe déjà");
-        }
         return productRepository.insert(product);
     }
 
@@ -48,5 +44,14 @@ public class ProductService {
         //Pour lever une la même exception si l'objet n'existe pas
         findById(product.getId());
         return productRepository.save(product);
+    }
+
+    public Product findMostExpensiveProduct() {
+        Optional<Product> target = productRepository.findTopByPriceDesc();
+        if (target.isPresent()) {
+            return target.get();
+        }else{
+            throw new ResourceNotFoundException("There is no such product");
+        }
     }
 }
