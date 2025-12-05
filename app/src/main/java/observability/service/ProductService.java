@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import observability.context.UserContext;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class ProductService {
