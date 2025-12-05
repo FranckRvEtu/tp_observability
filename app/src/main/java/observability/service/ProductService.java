@@ -1,7 +1,6 @@
 package observability.service;
 
 
-import observability.exceptions.ResourceConflictException;
 import observability.exceptions.ResourceNotFoundException;
 import observability.model.Product;
 import observability.repository.ProductRepository;
@@ -47,7 +46,7 @@ public class ProductService {
     }
 
     public Product findMostExpensiveProduct() {
-        Optional<Product> target = productRepository.findTopByPriceDesc();
+        Optional<Product> target = productRepository.findTopByPrice();
         if (target.isPresent()) {
             return target.get();
         }else{
