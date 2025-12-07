@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface ProductRepository extends MongoRepository<Product, String> {
     Optional<Product> findById(String id);
-    Optional<Product> findTopByPrice();
+    Optional<Product> findFirstByOrderByPriceDesc();
 }

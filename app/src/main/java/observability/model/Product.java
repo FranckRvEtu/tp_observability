@@ -11,8 +11,7 @@ public class Product {
     private float price;
     private String date;
 
-    public Product(String id, String name, float price, String date) {
-        this.id = id;
+    public Product(String name, float price, String date) {
         this.name = name;
         this.price = price;
         this.date = date;
