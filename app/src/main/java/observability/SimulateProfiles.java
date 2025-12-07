@@ -5,8 +5,11 @@ import observability.context.UserContext;
 import observability.model.Product;
 import observability.model.User;
 import observability.repository.UserRepository;
+import observability.service.LogProcessingService;
 import observability.service.ProductService;
 import observability.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,11 +17,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class SimulateProfiles implements CommandLineRunner {
 
+    private static final Logger log = LoggerFactory.getLogger(SimulateProfiles.class);
     @Autowired
     private UserService userService;
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private LogProcessingService logProcessingService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -68,7 +75,8 @@ public class SimulateProfiles implements CommandLineRunner {
             productService.findAll();
         });
 
-        System.err.println("Fin de la simulation");
+        System.err.println("Fin de la simulation\nDébut du parsing");
+        logProcessingService.parse();
     }
 
     private void simulateUser(String userId, Runnable actions) {

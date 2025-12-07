@@ -12,6 +12,9 @@ public class Profile {
     private String email;
     private ProfileType profileType;
 
+    public Profile() {
+    }
+
     public Profile(String id, String userId, String email, ProfileType profileType) {
         this.id = id;
         this.userId = userId;
