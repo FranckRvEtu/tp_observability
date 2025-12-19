@@ -3,11 +3,9 @@ package observability.controller;
 
 import observability.model.Product;
 import observability.service.ProductService;
-import observability.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,5 +44,15 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(addedProduct);
     }
 
-    
+    @PutMapping("/update")
+    public ResponseEntity<Product> updateProduct(@RequestBody Product product) {
+        Product updatedProduct = productService.update(product);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedProduct);
+    }
+
+    @GetMapping("/most-expensive")
+    public ResponseEntity<Product> getMostExpensiveProduct() {
+        Product product = productService.findMostExpensiveProduct();
+        return ResponseEntity.status(HttpStatus.OK).body(product);
+    }
 }
