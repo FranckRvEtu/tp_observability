@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produits - Observabilité</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #212529 !important;
+        }
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .page-header h1 {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-add:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .search-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .search-card h5 {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .product-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            position: relative;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .product-price {
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+        .product-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .btn-action {
+            border-radius: 0.5rem;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .btn-edit-custom {
+            background-color: #0d6efd;
+            border: none;
+            color: white;
+        }
+        .btn-edit-custom:hover {
+            background-color: #0b5ed7;
+            color: white;
+        }
+        .btn-danger-custom {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+        }
+        .btn-danger-custom:hover {
+            background-color: #c82333;
+            color: white;
+        }
+        .btn-info-custom {
+            background-color: #0dcaf0;
+            border: none;
+            color: white;
+        }
+        .btn-info-custom:hover {
+            background-color: #31d0ea;
+            color: white;
+        }
+        .alert {
+            border-radius: 10px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+        .badge-expensive {
+            background-color: #ffc107;
+            color: #000;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-graph-up"></i> Observabilité
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/products">
+                            <i class="bi bi-box"></i> Produits
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stats">
+                            <i class="bi bi-graph-up"></i> Statistiques
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1><i class="bi bi-box"></i> Gestion des Produits</h1>
+                    <p class="mb-0">Liste complète des produits disponibles</p>
+                </div>
+                <a href="/products/add" class="btn btn-add btn-lg">
+                    <i class="bi bi-plus-circle"></i> Ajouter un Produit
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <!-- Authentication Check Alert -->
+        <div id="authAlert" class="alert alert-warning alert-dismissible fade show d-none" role="alert">
+            <i class="bi bi-lock"></i>
+            Vous devez être connecté pour accéder à cette page. <a href="/login">Se connecter</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Error Alert -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="alert alert-info d-none">
+            <div class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            Chargement des produits...
+        </div>
+
+        <!-- Search Section -->
+        <div class="row g-3 mb-4">
+            <!-- Search by ID -->
+            <div class="col-lg-6">
+                <div class="search-card">
+                    <h5><i class="bi bi-search"></i> Rechercher par ID</h5>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchIdInput" placeholder="Entrez l'ID du produit..." />
+                        <button class="btn btn-primary" type="button" id="searchIdBtn">
+                            <i class="bi bi-search"></i> Rechercher
+                        </button>
+                    </div>
+                    <div id="searchIdResult" class="mt-3 d-none"></div>
+                </div>
+            </div>
+
+            <!-- Search Most Expensive -->
+            <div class="col-lg-6">
+                <div class="search-card">
+                    <h5><i class="bi bi-trophy"></i> Produits les plus chers</h5>
+                    <button class="btn btn-primary w-100" id="mostExpensiveBtn" type="button">
+                        <i class="bi bi-star"></i> Afficher le produit le plus cher
+                    </button>
+                    <div id="mostExpensiveResult" class="mt-3 d-none"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="productsContainer" class="row g-4">
+            <div th:if="${products}" th:each="product : ${products}" class="col-lg-4 col-md-6 col-sm-12" th:attr="data-product-id=${product.id}, data-product-price=${product.price}">
+                <div class="card product-card">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${product.name}">Nom du produit</h5>
+                        <small class="text-muted d-block mb-2">ID: <span th:text="${product.id}"></span></small>
+                        <p class="product-date">
+                            <i class="bi bi-calendar"></i>
+                            <span th:text="${product.date}">Date</span>
+                        </p>
+                        <p class="product-price">
+                            <i class="bi bi-currency-euro"></i>
+                            <span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+                        </p>
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-info-custom btn-action">
+                                <i class="bi bi-eye"></i> Voir détails
+                            </a>
+                            <a th:href="@{/products/{id}/edit(id=${product.id})}" class="btn btn-edit-custom btn-action">
+                                <i class="bi bi-pencil-square"></i> Éditer
+                            </a>
+                            <button class="btn btn-danger-custom btn-action"
+                                    th:onclick="deleteProduct([[${product.id}]], [[${product.name}]])">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${products.isEmpty()}" class="col-12">
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h3>Aucun produit</h3>
+                    <p>Il n'y a pas de produits pour le moment.</p>
+                    <a href="/products/add" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Créer le premier produit
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        // Vérifier que l'utilisateur est connecté
+        window.addEventListener('load', function() {
+            if (!Auth.isLoggedIn()) {
+                document.getElementById('authAlert').classList.remove('d-none');
+                // Rediriger après 3 secondes
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 3000);
+            }
+        });
+
+        // Supprimer un produit
+        function deleteProduct(productId, productName) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer le produit "' + productName + '"?')) {
+                document.getElementById('loadingIndicator').classList.remove('d-none');
+
+                fetch('/product/delete?id=' + productId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Erreur lors de la suppression');
+                })
+                .then(data => {
+                    alert('Produit supprimé avec succès!');
+                    location.reload();
+                })
+                .catch(error => {
+                    alert('Erreur: ' + error.message);
+                    document.getElementById('loadingIndicator').classList.add('d-none');
+                });
+            }
+        }
+
+        // Rechercher un produit par ID
+        document.getElementById('searchIdBtn').addEventListener('click', function() {
+            const productId = document.getElementById('searchIdInput').value.trim();
+
+            if (!productId) {
+                alert('Veuillez entrer un ID de produit');
+                return;
+            }
+
+            document.getElementById('loadingIndicator').classList.remove('d-none');
+
+            fetch('/product/fetch?id=' + encodeURIComponent(productId))
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Produit non trouvé');
+                })
+                .then(product => {
+                    displaySearchResult(product, 'searchIdResult');
+                })
+                .catch(error => {
+                    const resultDiv = document.getElementById('searchIdResult');
+                    resultDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-circle"></i> ' + error.message + '</div>';
+                    resultDiv.classList.remove('d-none');
+                })
+                .finally(() => {
+                    document.getElementById('loadingIndicator').classList.add('d-none');
+                });
+        });
+
+        // Permettre la recherche en appuyant sur Entrée
+        document.getElementById('searchIdInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('searchIdBtn').click();
+            }
+        });
+
+        // Afficher le produit le plus cher
+        document.getElementById('mostExpensiveBtn').addEventListener('click', function() {
+            document.getElementById('loadingIndicator').classList.remove('d-none');
+
+            fetch('/product/most-expensive')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Aucun produit disponible');
+                })
+                .then(product => {
+                    displaySearchResult(product, 'mostExpensiveResult');
+                })
+                .catch(error => {
+                    const resultDiv = document.getElementById('mostExpensiveResult');
+                    resultDiv.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> ' + error.message + '</div>';
+                    resultDiv.classList.remove('d-none');
+                })
+                .finally(() => {
+                    document.getElementById('loadingIndicator').classList.add('d-none');
+                });
+        });
+
+        // Afficher le résultat de la recherche dans une carte
+        function displaySearchResult(product, containerId) {
+            const resultDiv = document.getElementById(containerId);
+            const formattedPrice = (product.price).toFixed(2);
+
+            resultDiv.innerHTML = `
+                <div class="card product-card">
+                    <div class="card-body">
+                        <h5 class="card-title">${product.name}</h5>
+                        <small class="text-muted d-block mb-2">ID: ${product.id}</small>
+                        <p class="product-date">
+                            <i class="bi bi-calendar"></i>
+                            ${product.date}
+                        </p>
+                        <p class="product-price">
+                            <i class="bi bi-currency-euro"></i>
+                            ${formattedPrice}
+                        </p>
+                        <div class="d-grid gap-2">
+                            <a href="/products/${product.id}" class="btn btn-info-custom btn-action">
+                                <i class="bi bi-eye"></i> Voir détails
+                            </a>
+                            <a href="/products/${product.id}/edit" class="btn btn-edit-custom btn-action">
+                                <i class="bi bi-pencil-square"></i> Éditer
+                            </a>
+                            <button class="btn btn-danger-custom btn-action" onclick="deleteProduct('${product.id}', '${product.name}')">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            resultDiv.classList.remove('d-none');
+        }
+    </script>
+    <script type="module" src="/js/tracing.js"></script>
+</body>
+</html>

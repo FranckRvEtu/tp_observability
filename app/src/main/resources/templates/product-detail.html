@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product?.name ?: 'Détail du produit'} + ' - Observabilité'">Détail du produit - Observabilité</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #212529 !important;
+        }
+        .breadcrumb-container {
+            background-color: white;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .product-detail {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .product-header h1 {
+            color: #333;
+            font-weight: bold;
+            margin: 0;
+        }
+        .product-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+        .product-price {
+            font-size: 3rem;
+            color: #667eea;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        .product-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .info-item {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .info-item .label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .info-item .value {
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        .btn-custom {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-delete:hover {
+            background-color: #c82333;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .btn-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-back:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .alert {
+            border-radius: 10px;
+        }
+        .error-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .error-container i {
+            font-size: 4rem;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+        footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-graph-up"></i> Observabilité
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/products">
+                            <i class="bi bi-box"></i> Produits
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stats">
+                            <i class="bi bi-graph-up"></i> Statistiques
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-container">
+        <div class="container-fluid">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="/products">Produits</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${product?.name ?: 'Produit'}">
+                        Détail du produit
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div th:if="${error}" class="error-container">
+            <i class="bi bi-exclamation-circle"></i>
+            <h3>Erreur</h3>
+            <p th:text="${error}">Le produit demandé n'existe pas.</p>
+            <a href="/products" class="btn btn-primary mt-3">
+                <i class="bi bi-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+
+        <div th:if="${product}" class="product-detail">
+            <!-- Product Header -->
+            <div class="product-header">
+                <div>
+                    <h1 th:text="${product.name}">Nom du produit</h1>
+                </div>
+                <div class="product-badge">
+                    <i class="bi bi-box"></i> Produit
+                </div>
+            </div>
+
+            <!-- Product Price -->
+            <div class="product-price">
+                <i class="bi bi-currency-euro"></i>
+                <span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+            </div>
+
+            <!-- Product Information -->
+            <div class="product-info">
+                <div class="info-item">
+                    <div class="label"><i class="bi bi-tag"></i> Identifiant</div>
+                    <div class="value" th:text="${product.id}">ID</div>
+                </div>
+                <div class="info-item">
+                    <div class="label"><i class="bi bi-calendar"></i> Date</div>
+                    <div class="value" th:text="${product.date}">Date</div>
+                </div>
+                <div class="info-item">
+                    <div class="label"><i class="bi bi-clock"></i> Ajouté à</div>
+                    <div class="value">Aujourd'hui</div>
+                </div>
+            </div>
+
+            <!-- Product Description Section -->
+            <div style="background-color: #f8f9fa; padding: 2rem; border-radius: 10px; margin: 2rem 0;">
+                <h4><i class="bi bi-info-circle"></i> Informations détaillées</h4>
+                <p>
+                    Ce produit a été ajouté au catalogue de votre système d'observabilité.
+                    Vous pouvez consulter les détails ci-dessus et effectuer des actions sur ce produit.
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/products" class="btn-custom btn-back">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+                <button class="btn-custom btn-delete" th:onclick="deleteProduct([[${product.id}]], [[${product.name}]])">
+                    <i class="bi bi-trash"></i> Supprimer ce produit
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function deleteProduct(productId, productName) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer le produit "' + productName + '"?')) {
+                fetch('/product/delete?id=' + productId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Erreur lors de la suppression');
+                })
+                .then(data => {
+                    alert('Produit supprimé avec succès!');
+                    window.location.href = '/products';
+                })
+                .catch(error => {
+                    alert('Erreur: ' + error.message);
+                });
+            }
+        }
+    </script>
+    <script type="module" src="/js/tracing.js"></script>
+</body>
+</html>
+

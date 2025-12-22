@@ -1,4 +1,4 @@
-package observability.app;
+package observability.scanner;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

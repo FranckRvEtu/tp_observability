@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques - Observabilité</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #212529 !important;
+        }
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .page-header h1 {
+            font-weight: bold;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #667eea;
+        }
+        .stat-card h4 {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .product-card .product-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .product-card .product-price {
+            font-size: 2rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+        .product-card .product-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            height: 400px;
+        }
+        .alert {
+            border-radius: 10px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+        footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: #6c757d;
+        }
+        .icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-graph-up"></i> Observabilité
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">
+                            <i class="bi bi-box"></i> Produits
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/stats">
+                            <i class="bi bi-graph-up"></i> Statistiques
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container-fluid">
+            <h1><i class="bi bi-graph-up"></i> Statistiques</h1>
+            <p class="mb-0">Analysez les données et consultez les statistiques de votre catalogue</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <!-- Error Alert -->
+        <div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Most Expensive Product -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div th:if="${mostExpensive}" class="product-card">
+                    <i class="bi bi-trophy icon"></i>
+                    <h4>Produit le plus cher</h4>
+                    <div class="product-name" th:text="${mostExpensive.name}">
+                        Nom du produit
+                    </div>
+                    <div class="product-price">
+                        <i class="bi bi-currency-euro"></i>
+                        <span th:text="${#numbers.formatDecimal(mostExpensive.price, 1, 2)}">0.00</span>
+                    </div>
+                    <div class="product-date">
+                        <i class="bi bi-calendar"></i>
+                        <span th:text="${mostExpensive.date}">Date</span>
+                    </div>
+                </div>
+
+                <div th:if="${!mostExpensive}" class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h4>Pas de produits</h4>
+                    <p>Aucun produit disponible pour les statistiques.</p>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="col-lg-6">
+                <div class="stat-card">
+                    <i class="bi bi-info-circle icon"></i>
+                    <h4>À propos</h4>
+                    <p>
+                        Cette page affiche les statistiques clés de votre catalogue de produits.
+                        Vous pouvez voir le produit le plus cher et d'autres métriques importantes.
+                    </p>
+                    <a href="/products" class="btn btn-primary mt-3">
+                        <i class="bi bi-box"></i> Voir tous les produits
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="stat-card">
+                    <h4><i class="bi bi-bar-chart"></i> Informations supplémentaires</h4>
+                    <p>
+                        Cette section vous permet de suivre les performances et les analyses de votre système.
+                        Utilisez les données fournies pour prendre des décisions éclairées sur votre catalogue.
+                    </p>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Fonctionnalités disponibles :</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success"></i> Affichage du produit le plus cher</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Suivi en temps réel</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Analyse des données</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Rapports détaillés</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Prochaines étapes :</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-right text-info"></i> Ajouter plus de produits</li>
+                                <li><i class="bi bi-arrow-right text-info"></i> Analyser les tendances</li>
+                                <li><i class="bi bi-arrow-right text-info"></i> Optimiser les prix</li>
+                                <li><i class="bi bi-arrow-right text-info"></i> Générer des rapports</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        // Charger les statistiques depuis l'API
+        window.addEventListener('load', function() {
+            fetch('/product/all')
+                .then(response => response.json())
+                .then(products => {
+                    console.log('Produits chargés:', products);
+                    if (products.length > 0) {
+                        // Vous pouvez ajouter plus de traitements ici
+                        console.log('Total de produits:', products.length);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des statistiques:', error);
+                });
+        });
+    </script>
+    <script type="module" src="/js/tracing.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,21 @@
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+
+        <File name="ProfileFile" fileName="logs/profile.json">
+            <PatternLayout pattern="%msg%n"/>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="profile.logger" level="info" additivity="false">
+            <AppenderRef ref="ProfileFile"/>
+        </Logger>
+
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

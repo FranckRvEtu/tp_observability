@@ -1,4 +1,4 @@
-package observability.app;
+package observability;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -20,7 +20,7 @@ public class FrevTp3Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
+        System.err.println("L'application est dispobible à l'adresse localhost://"+env.getProperty("local.server.port"));
     }
 
 }
